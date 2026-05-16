@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:http/http.dart' as http;
+import 'package:pretty_qr_code/pretty_qr_code.dart';
 
 import '../../../shop/presentation/bloc/shop_bloc.dart';
 import '../bloc/billing_bloc.dart';
@@ -77,7 +78,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: const Text('Checkout', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
+            title: const Text('Finalizar Compra', style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600)),
             centerTitle: true,
             backgroundColor: Colors.transparent,
             elevation: 0,
@@ -93,7 +94,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             listener: (context, state) {
               if (state.printSuccess) {
                 ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Receipt handled successfully'), backgroundColor: Colors.green));
+                    content: Text('Recibo gerado com sucesso'), backgroundColor: Colors.green));
               }
               if (state.error != null && state.error!.isNotEmpty) {
                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
@@ -153,8 +154,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                         border: Border(bottom: BorderSide(color: borderColor)),
                                       ),
                                       children: [
-                                        _buildHeaderCell('Product Name', TextAlign.left),
-                                        _buildHeaderCell('Price', TextAlign.right),
+                                        _buildHeaderCell('Nome do Produto', TextAlign.left),
+                                        _buildHeaderCell('Preço', TextAlign.right),
                                         _buildHeaderCell('Total', TextAlign.right),
                                       ],
                                     ),
@@ -162,8 +163,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                       return TableRow(
                                         children: [
                                           _buildDataCell('${item.quantity} x ${item.product.name}', TextAlign.left),
-                                          _buildDataCell('₹${item.product.price.toStringAsFixed(2)}', TextAlign.right, isSubtitle: true),
-                                          _buildDataCell('₹${item.total.toStringAsFixed(2)}', TextAlign.right, isBold: true),
+                                          _buildDataCell('${item.product.price.toStringAsFixed(2)} Kz', TextAlign.right, isSubtitle: true),
+                                          _buildDataCell('${item.total.toStringAsFixed(2)} Kz', TextAlign.right, isBold: true),
                                         ],
                                       );
                                     }),
@@ -175,7 +176,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             
                             // Payment Options
                             if (billingState.paymentStatus != 'confirmed') ...[
-                              const Text('Select Payment Method', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                              const Text('Selecione o Método de Pagamento', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 12),
                               Wrap(
                                 spacing: 8,
@@ -185,7 +186,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   _buildMethodButton('Express', Icons.phone_android),
                                   _buildMethodButton('Referência', Icons.numbers),
                                   _buildMethodButton('QR', Icons.qr_code),
-                                  _buildMethodButton('Cash', Icons.money),
+                                  _buildMethodButton('Numerário', Icons.money),
                                   _buildMethodButton('TPA', Icons.credit_card),
                                 ],
                               ),
@@ -195,9 +196,9 @@ class _CheckoutPageState extends State<CheckoutPage> {
                             ] else ...[
                               const Icon(Icons.check_circle, color: Colors.green, size: 64),
                               const SizedBox(height: 16),
-                              const Text('Payment Confirmed!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                              const Text('Pagamento Confirmado!', style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                               const SizedBox(height: 8),
-                              const Text('Stock reduced and transaction saved.', style: TextStyle(color: Colors.grey)),
+                              const Text('Stock reduzido e transação guardada.', style: TextStyle(color: Colors.grey)),
                               const SizedBox(height: 24),
                               PrimaryButton(
                                 onPressed: () {
@@ -205,7 +206,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                     shopName: shopName, address1: address1, address2: address2, phone: phone, footer: footer
                                   ));
                                 },
-                                label: 'Print Receipt',
+                                label: 'Imprimir Recibo',
                                 icon: Icons.print,
                                 isLoading: billingState.isPrinting,
                               ),
@@ -217,7 +218,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   ));
                                 },
                                 icon: const Icon(Icons.share),
-                                label: const Text('Share Receipt as PDF'),
+                                label: const Text('Partilhar Recibo em PDF'),
                                 style: OutlinedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -229,7 +230,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                                   context.read<BillingBloc>().add(ClearCartEvent());
                                   context.go('/');
                                 },
-                                child: const Text('New Order'),
+                                child: const Text('Novo Pedido'),
                               )
                             ],
 
@@ -253,8 +254,8 @@ class _CheckoutPageState extends State<CheckoutPage> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text('GRAND TOTAL', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey[600], letterSpacing: 1.2)),
-                          Text('₹${billingState.totalAmount.toStringAsFixed(2)}', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
+                          Text('TOTAL GERAL', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.grey[600], letterSpacing: 1.2)),
+                          Text('${billingState.totalAmount.toStringAsFixed(2)} Kz', style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF0F172A))),
                         ],
                       ),
                     ),
@@ -315,48 +316,67 @@ class _CheckoutPageState extends State<CheckoutPage> {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           if (_selectedMethod == 'Express') ...[
-            const Text('Enter Customer Phone Number'),
+            const Text('Insira o Número de Telemóvel do Cliente'),
             const SizedBox(height: 8),
             TextField(
               controller: _phoneController,
               keyboardType: TextInputType.phone,
-              decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'e.g. 923000000'),
+              decoration: const InputDecoration(border: OutlineInputBorder(), hintText: 'ex. 923000000'),
             ),
             const SizedBox(height: 12),
-            if (_dizanpayEntity.isEmpty)
-              PrimaryButton(
-                onPressed: _isLoadingPayment ? null : () {
-                  _createDizanpayPayment(totalAmount, 'EXP', _phoneController.text);
-                },
-                label: 'Send Payment Request',
-                isLoading: _isLoadingPayment,
-              )
-            else
-              _buildDizanpayStatus('Express request sent. Awaiting confirmation...'),
+            PrimaryButton(
+              onPressed: _isLoadingPayment ? null : () async {
+                await _createDizanpayPayment(totalAmount, 'EXP', _phoneController.text);
+                if (mounted) {
+                  context.read<BillingBloc>().add(const ConfirmPaymentEvent());
+                }
+              },
+              label: 'Confirmar Pagamento Express',
+              isLoading: _isLoadingPayment,
+            )
           ] else if (_selectedMethod == 'Referência') ...[
             if (_dizanpayEntity.isEmpty)
               PrimaryButton(
                 onPressed: _isLoadingPayment ? null : () {
                   _createDizanpayPayment(totalAmount, 'REF', null);
                 },
-                label: 'Generate Reference',
+                label: 'Gerar Referência',
                 isLoading: _isLoadingPayment,
               )
             else
-              _buildDizanpayStatus('Reference Generated'),
+              _buildDizanpayStatus('Referência Gerada'),
           ] else if (_selectedMethod == 'QR') ...[
             if (_dizanpayEntity.isEmpty)
               PrimaryButton(
                 onPressed: _isLoadingPayment ? null : () {
-                  _createDizanpayPayment(totalAmount, 'PIX', null); // Or QR if supported
+                  _createDizanpayPayment(totalAmount, 'PIX', null);
                 },
-                label: 'Generate QR',
+                label: 'Gerar QR',
                 isLoading: _isLoadingPayment,
               )
             else
-              _buildDizanpayStatus('QR Generated (Use Entity & Ref for now)'),
-          ] else if (_selectedMethod == 'Cash') ...[
-             const Text('Amount Given by Customer'),
+              Column(
+                children: [
+                  const Text('QR Gerado', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: 180,
+                    height: 180,
+                    child: PrettyQrView.data(
+                      data: '00020101021226500014br.gov.bcb.pix0128$_dizanpayReference', // Mock PIX payload
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  PrimaryButton(
+                    onPressed: () {
+                      context.read<BillingBloc>().add(const ConfirmPaymentEvent());
+                    },
+                    label: 'Confirmar Pagamento QR',
+                  ),
+                ],
+              ),
+          ] else if (_selectedMethod == 'Numerário') ...[
+             const Text('Valor Entregue pelo Cliente'),
              const SizedBox(height: 8),
              TextField(
               controller: _cashController,
@@ -370,7 +390,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
                 builder: (context) {
                   final given = double.tryParse(_cashController.text) ?? 0;
                   final change = given - totalAmount;
-                  return Text('Change Needed: ₹${change.toStringAsFixed(2)}', 
+                  return Text('Troco: ${change.toStringAsFixed(2)} Kz', 
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: change >= 0 ? Colors.green : Colors.red));
                 }
               ),
@@ -380,21 +400,21 @@ class _CheckoutPageState extends State<CheckoutPage> {
               onPressed: () {
                  final given = double.tryParse(_cashController.text) ?? 0;
                  if (given < totalAmount) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Amount given is less than total')));
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('O valor entregue é inferior ao total')));
                     return;
                  }
                  context.read<BillingBloc>().add(const ConfirmPaymentEvent());
               },
-              label: 'Confirm Cash Payment',
+              label: 'Confirmar Pagamento em Numerário',
             )
           ] else if (_selectedMethod == 'TPA') ...[
-             const Text('Process payment on the TPA terminal.'),
+             const Text('Processe o pagamento no terminal TPA.'),
              const SizedBox(height: 16),
              PrimaryButton(
               onPressed: () {
                  context.read<BillingBloc>().add(const ConfirmPaymentEvent());
               },
-              label: 'Confirm TPA Payment',
+              label: 'Confirmar Pagamento TPA',
             )
           ]
         ],
@@ -412,13 +432,13 @@ class _CheckoutPageState extends State<CheckoutPage> {
           children: [
             Column(
               children: [
-                const Text('Entity', style: TextStyle(color: Colors.grey)),
+                const Text('Entidade', style: TextStyle(color: Colors.grey)),
                 Text(_dizanpayEntity, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               ],
             ),
             Column(
               children: [
-                const Text('Reference', style: TextStyle(color: Colors.grey)),
+                const Text('Referência', style: TextStyle(color: Colors.grey)),
                 Text(_dizanpayReference, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               ],
             ),
@@ -430,7 +450,7 @@ class _CheckoutPageState extends State<CheckoutPage> {
             // Here you would ideally poll, but for manual confirmation:
             context.read<BillingBloc>().add(const ConfirmPaymentEvent());
           },
-          label: 'Confirm Payment Received',
+          label: 'Confirmar Pagamento Recebido',
         ),
       ],
     );

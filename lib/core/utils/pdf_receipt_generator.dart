@@ -61,7 +61,7 @@ class PdfReceiptGenerator {
                 mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
                 children: [
                   pw.Text('TOTAL', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16)),
-                  pw.Text('₹${total.toStringAsFixed(2)}', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16)),
+                  pw.Text('${total.toStringAsFixed(2)} Kz', style: pw.TextStyle(fontWeight: pw.FontWeight.bold, fontSize: 16)),
                 ],
               ),
               pw.SizedBox(height: 16),
