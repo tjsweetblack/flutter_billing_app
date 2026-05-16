@@ -13,6 +13,8 @@ import '../../features/settings/presentation/bloc/printer_bloc.dart';
 import '../../features/accounting/data/repositories/accounting_repository_impl.dart';
 import '../../features/accounting/domain/repositories/accounting_repository.dart';
 import '../../features/accounting/presentation/bloc/accounting_bloc.dart';
+import '../../features/billing/presentation/bloc/billing_bloc.dart';
+
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -43,6 +45,14 @@ Future<void> init() async {
   sl.registerFactory(
     () => AccountingBloc(
       repository: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => BillingBloc(
+      getProductByBarcodeUseCase: sl(),
+      updateProductUseCase: sl(),
+      accountingRepository: sl(),
     ),
   );
 

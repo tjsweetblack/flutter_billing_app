@@ -1,5 +1,4 @@
 import 'package:fpdart/fpdart.dart';
-import 'package:hive/hive.dart';
 import '../../../../core/data/hive_database.dart';
 import '../../../../core/error/failure.dart';
 import '../../domain/entities/accounting_transaction.dart';
