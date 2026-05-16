@@ -261,7 +261,7 @@ class _AccountingPageState extends State<AccountingPage>
         leading: IconButton(
           icon: Icon(Icons.chevron_left,
               size: 28, color: Theme.of(context).primaryColor),
-          onPressed: () => context.go('/menu'),
+          onPressed: () => context.go('/settings'),
         ),
         actions: [
           IconButton(

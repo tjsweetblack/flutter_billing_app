@@ -141,7 +141,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 _buildOverlayButton(
-                  icon: Icons.settings,
+                  icon: Icons.menu,
                   onPressed: () async {
                     _scannerController.stop();
                     await context.push('/settings');
