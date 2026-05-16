@@ -5,8 +5,11 @@ import '../../features/product/presentation/pages/add_product_page.dart';
 import '../../features/product/presentation/pages/edit_product_page.dart';
 import '../../features/shop/presentation/pages/shop_details_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
+import '../../features/settings/presentation/pages/menu_page.dart';
 import '../../features/billing/presentation/pages/scanner_page.dart';
 import '../../features/billing/presentation/pages/checkout_page.dart';
+import '../../features/accounting/presentation/pages/accounting_page.dart';
+import '../../features/accounting/presentation/pages/credit_score_page.dart';
 import '../../features/product/domain/entities/product.dart';
 
 final router = GoRouter(
@@ -28,7 +31,15 @@ final router = GoRouter(
     ),
     GoRoute(
       path: '/settings',
-      builder: (context, state) => const SettingsPage(),
+      builder: (context, state) => const MenuPage(),
+    ),
+    GoRoute(
+      path: '/accounting',
+      builder: (context, state) => const AccountingPage(),
+    ),
+    GoRoute(
+      path: '/credit-score',
+      builder: (context, state) => const CreditScorePage(),
     ),
     GoRoute(
       path: '/products',

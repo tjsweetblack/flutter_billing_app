@@ -38,10 +38,20 @@ dependencies:
   # Scanner & Printer
   pretty_qr_code: ^3.3.0
   print_bluetooth_thermal: ^1.1.2
-  mobile_scanner: ^5.1.0
+  mobile_scanner: ^7.2.0
   bloc: ^8.1.4
   uuid: ^4.5.2
   app_settings: ^7.0.0
+  http: ^1.6.0
+
+  # Firebase
+  firebase_core: ^3.15.0
+  cloud_firestore: ^5.6.0
+
+  # Share & Files
+  share_plus: ^10.0.0
+  path_provider: ^2.1.0
+  pdf: ^3.11.0
 
 dev_dependencies:
   flutter_test:

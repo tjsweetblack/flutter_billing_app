@@ -1,0 +1,719 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kandonga POS - Portal Bancário</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: #f8fafc; min-height: 100vh; }
+
+        .login-container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        .login-box { background: white; padding: 40px; border-radius: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
+        .logo { width: 80px; height: 80px; margin-bottom: 20px; display: block; margin-left: auto; margin-right: auto; background: linear-gradient(135deg, #7ed957, #6ab64a); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 32px; color: white; font-weight: bold; }
+        .login-box h2 { text-align: center; color: #1e293b; margin-bottom: 8px; }
+        .login-box p { text-align: center; color: #64748b; margin-bottom: 24px; font-size: 14px; }
+        .form-group { margin-bottom: 16px; }
+        .form-group label { display: block; margin-bottom: 8px; font-weight: 600; color: #334155; }
+        .form-group input, .form-group select { width: 100%; padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; transition: border-color 0.3s; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #7ed957; }
+        .btn { width: 100%; padding: 14px; background: #7ed957; color: white; border: none; border-radius: 12px; font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.3s; }
+        .btn:hover { background: #6ab64a; }
+        .btn-success { background: #22c55e; }
+        .btn-danger { background: #ef4444; }
+        .btn-warning { background: #f59e0b; }
+
+        .dashboard { display: none; }
+        .header { background: white; padding: 16px 24px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; }
+        .header-left { display: flex; align-items: center; gap: 16px; }
+        .header-logo { width: 40px; height: 40px; background: linear-gradient(135deg, #7ed957, #6ab64a); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .header h1 { font-size: 20px; color: #1e293b; }
+        .header-right { display: flex; align-items: center; gap: 16px; }
+        .user-info { display: flex; align-items: center; gap: 8px; }
+        .user-avatar { width: 40px; height: 40px; background: #7ed957; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; }
+        .logout-btn { padding: 8px 16px; background: #fee2e2; color: #ef4444; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; padding: 24px; }
+        .stat-card { background: white; padding: 24px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .stat-card h3 { color: #64748b; font-size: 14px; margin-bottom: 8px; }
+        .stat-card .value { font-size: 32px; font-weight: bold; color: #1e293b; }
+        .stat-card.pending { border-left: 4px solid #f59e0b; }
+        .stat-card.approved { border-left: 4px solid #22c55e; }
+        .stat-card.rejected { border-left: 4px solid #ef4444; }
+        .stat-card.total { border-left: 4px solid #7ed957; }
+
+        .content { padding: 0 24px 24px; }
+        .section-title { font-size: 18px; font-weight: 600; color: #1e293b; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .refresh-btn { background: #e8f5e9; color: #4caf50; border: none; padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 14px; }
+        .filters { display: flex; gap: 16px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filters select, .filters input { padding: 10px 16px; border: 2px solid #e2e8f0; border-radius: 10px; font-size: 14px; }
+        .loan-list { background: white; border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .loan-item { padding: 20px; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
+        .loan-item:hover { background: #f8fafc; }
+        .loan-item:last-child { border-bottom: none; }
+        .loan-info { flex: 1; }
+        .loan-info h4 { font-size: 16px; color: #1e293b; margin-bottom: 4px; }
+        .loan-info p { color: #64748b; font-size: 14px; }
+        .loan-amount { font-size: 20px; font-weight: bold; color: #22c55e; margin-right: 20px; }
+        .loan-status { padding: 6px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; text-transform: uppercase; }
+        .status-pending { background: #fef3c7; color: #d97706; }
+        .status-approved { background: #dcfce7; color: #16a34a; }
+        .status-rejected { background: #fee2e2; color: #dc2626; }
+        .loan-actions button { padding: 8px 16px; border: none; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s; }
+        .loan-actions button:hover { transform: scale(1.05); }
+        .btn-view { background: #e8f5e9; color: #4caf50; }
+
+        .spinner { display: flex; justify-content: center; align-items: center; padding: 60px; }
+        .spinner::after { content: ''; width: 40px; height: 40px; border: 4px solid #e2e8f0; border-top-color: #7ed957; border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 200; justify-content: center; align-items: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; border-radius: 16px; width: 100%; max-width: 600px; max-height: 90vh; overflow-y: auto; padding: 24px; }
+        .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .modal-header h2 { font-size: 20px; color: #1e293b; }
+        .close-modal { width: 32px; height: 32px; border-radius: 50%; border: none; background: #fee2e2; color: #ef4444; cursor: pointer; font-size: 20px; }
+        .detail-section { margin-bottom: 20px; }
+        .detail-section h3 { font-size: 14px; color: #64748b; text-transform: uppercase; margin-bottom: 12px; letter-spacing: 1px; }
+        .detail-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; }
+        .detail-item { background: #f8fafc; padding: 12px; border-radius: 8px; }
+        .detail-item label { font-size: 12px; color: #64748b; display: block; margin-bottom: 4px; }
+        .detail-item span { font-size: 16px; font-weight: 600; color: #1e293b; }
+        .transaction-table { width: 100%; border-collapse: collapse; }
+        .transaction-table th, .transaction-table td { padding: 10px; text-align: left; border-bottom: 1px solid #e2e8f0; }
+        .transaction-table th { background: #f8fafc; font-weight: 600; color: #64748b; font-size: 12px; text-transform: uppercase; }
+        .score-bar { height: 8px; background: #e2e8f0; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+        .score-fill { height: 100%; border-radius: 4px; transition: width 0.5s; }
+        .score-high { background: #22c55e; }
+        .score-medium { background: #f59e0b; }
+        .score-low { background: #ef4444; }
+
+        @media (max-width: 768px) {
+            .stats-grid { grid-template-columns: 1fr; }
+            .loan-item { flex-direction: column; align-items: flex-start; gap: 12px; }
+            .loan-actions { width: 100%; }
+            .detail-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration from Firebase Console
+        // Replace these placeholders with your actual Firebase config from Firebase Console
+        var firebaseConfig = {
+            apiKey: "YOUR_API_KEY",
+            authDomain: "kandonga-c3d67.firebaseapp.com",
+            projectId: "kandonga-c3d67",
+            storageBucket: "kandonga-c3d67.appspot.com",
+            messagingSenderId: "YOUR_SENDER_ID",
+            appId: "YOUR_APP_ID"
+        };
+
+        let db = null;
+        let isFirebaseReady = false;
+        let currentBank = '';
+        let selectedLoanId = '';
+        let allLoans = [];
+        let unsubscribe = null;
+
+        // Initialize Firebase
+        function initFirebase() {
+            try {
+                if (typeof firebase === 'undefined' || !firebase.apps) {
+                    console.log('Demo Mode: Firebase SDK not loaded');
+                    isFirebaseReady = false;
+                    return false;
+                }
+                
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                db = firebase.firestore();
+                isFirebaseReady = true;
+                console.log('Firebase connected - Real mode');
+                
+                return true;
+            } catch (err) {
+                console.log('Demo Mode: Firebase init failed - ' + err.message);
+                isFirebaseReady = false;
+                return false;
+            }
+        }
+
+        // Initialize on load
+        initFirebase();
+
+        async function loadLoans() {
+            document.getElementById('loadingState').style.display = 'flex';
+            document.getElementById('loanList').innerHTML = '';
+
+            try {
+                if (isFirebaseReady && db) {
+                    // Cancel any existing listener
+                    if (unsubscribe) {
+                        unsubscribe();
+                    }
+                    
+                    // Real-time listener for Firestore
+                    unsubscribe = db.collection('loan_requests')
+                        .where('bank', '==', currentBank)
+                        .orderBy('createdAt', 'desc')
+                        .onSnapshot((snapshot) => {
+                            allLoans = snapshot.docs.map(doc => ({
+                                id: doc.id,
+                                ...doc.data()
+                            }));
+                            updateStats();
+                            renderLoans();
+                            document.getElementById('loadingState').style.display = 'none';
+                        }, (error) => {
+                            console.log('Firestore listener error, using demo data');
+                            loadDemoData();
+                        });
+                        
+                    // Also do initial load
+                    const snapshot = await db.collection('loan_requests')
+                        .where('bank', '==', currentBank)
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                    
+                    allLoans = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data()
+                    }));
+                } else {
+                    loadDemoData();
+                }
+            } catch (err) {
+                console.log('Using demo mode - Firebase not available:', err.message);
+                loadDemoData();
+            }
+
+            document.getElementById('loadingState').style.display = 'none';
+            updateStats();
+            renderLoans();
+        }
+        
+        function loadDemoData() {
+            allLoans = [
+                { id: 'LOAN-DEMO-001', shopName: 'Mini Mercado Central', ownerName: 'João Manuel', amount: 100000, date: '2026-05-15', status: 'pending', healthScore: 78, fraudScore: 92, transactions: 156, profit: 450000, consistency: 85, growth: 12.5, bank: currentBank, transactionsList: [{date: '2026-05-15', type: 'sale', amount: 25000, method: 'Multicaixa'}] },
+                { id: 'LOAN-DEMO-002', shopName: 'Padaria Sonho', ownerName: 'Maria Silva', amount: 50000, date: '2026-05-14', status: 'pending', healthScore: 65, fraudScore: 78, transactions: 89, profit: 180000, consistency: 72, growth: -5.2, bank: currentBank, transactionsList: [] },
+                { id: 'LOAN-DEMO-003', shopName: 'Farmácia Vida', ownerName: 'Paulo Domingos', amount: 250000, date: '2026-05-13', status: 'approved', healthScore: 91, fraudScore: 98, transactions: 412, profit: 1200000, consistency: 96, growth: 22.1, bank: currentBank, transactionsList: [] },
+            ];
+        }
+
+        function login() {
+            const bank = document.getElementById('bankSelect').value;
+            const email = document.getElementById('emailInput').value;
+
+            if (!bank || !email) {
+                alert('Por favor, preencha todos os campos');
+                return;
+            }
+
+            currentBank = bank;
+            document.getElementById('bankName').textContent = bank;
+            document.getElementById('userAvatar').textContent = bank[0];
+            
+            if (isFirebaseReady) {
+                document.getElementById('connectionStatus').textContent = '● Firestore';
+                document.getElementById('connectionStatus').style.color = '#22c55e';
+            } else {
+                document.getElementById('connectionStatus').textContent = '● Demo';
+                document.getElementById('connectionStatus').style.color = '#f59e0b';
+            }
+
+            document.getElementById('loginPage').style.display = 'none';
+            document.getElementById('dashboard').style.display = 'block';
+
+            loadLoans();
+        }
+
+        function logout() {
+            if (unsubscribe) {
+                unsubscribe();
+                unsubscribe = null;
+            }
+            document.getElementById('loginPage').style.display = 'flex';
+            document.getElementById('dashboard').style.display = 'none';
+            document.getElementById('bankSelect').value = '';
+            document.getElementById('emailInput').value = '';
+            document.getElementById('passwordInput').value = '';
+            allLoans = [];
+        }
+
+        async function updateLoanStatus(loanId, status) {
+            try {
+                if (isFirebaseReady && db) {
+                    await db.collection('loan_requests').doc(loanId).update({
+                        status: status,
+                        updatedAt: new Date().toISOString(),
+                        updatedBy: currentBank
+                    });
+                } else {
+                    // Demo mode
+                    const loan = allLoans.find(l => l.id === loanId);
+                    if (loan) loan.status = status;
+                    updateStats();
+                    renderLoans();
+                }
+            } catch (err) {
+                console.log('Error updating loan:', err.message);
+            }
+        }
+
+        function updateStats() {
+            const bankLoans = allLoans.filter(l => l.bank === currentBank);
+            const pending = bankLoans.filter(l => l.status === 'pending').length;
+            const approved = bankLoans.filter(l => l.status === 'approved').length;
+            const rejected = bankLoans.filter(l => l.status === 'rejected').length;
+            const total = bankLoans.reduce((sum, l) => sum + (l.amount || 0), 0);
+
+            document.getElementById('pendingCount').textContent = pending;
+            document.getElementById('approvedCount').textContent = approved;
+            document.getElementById('rejectedCount').textContent = rejected;
+            document.getElementById('totalAmount').textContent = 'Kz ' + total.toLocaleString();
+        }
+
+        function filterLoans() { renderLoans(); }
+
+        function renderLoans() {
+            const bankLoans = allLoans.filter(l => l.bank === currentBank);
+            const statusFilter = document.getElementById('statusFilter').value;
+            const amountFilter = document.getElementById('amountFilter').value;
+            const search = document.getElementById('searchInput').value.toLowerCase();
+
+            let filtered = bankLoans;
+            if (statusFilter) filtered = filtered.filter(l => l.status === statusFilter);
+            if (amountFilter) filtered = filtered.filter(l => l.amount <= parseInt(amountFilter));
+            if (search) filtered = filtered.filter(l => (l.shopName || '').toLowerCase().includes(search) || (l.ownerName || '').toLowerCase().includes(search));
+
+            const loanList = document.getElementById('loanList');
+            if (filtered.length === 0) {
+                loanList.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b;">Nenhuma solicitação encontrada</div>';
+                return;
+            }
+
+            loanList.innerHTML = filtered.map(loan => `
+                <div class="loan-item">
+                    <div class="loan-info">
+                        <h4>${loan.shopName || 'N/A'}</h4>
+                        <p>${loan.ownerName || 'N/A'} • ${loan.id} • ${formatDate(loan.date)}</p>
+                    </div>
+                    <div class="loan-amount">Kz ${(loan.amount || 0).toLocaleString()}</div>
+                    <span class="loan-status status-${loan.status}">${getStatusLabel(loan.status)}</span>
+                    <div class="loan-actions">
+                        <button class="btn-view" onclick="viewLoan('${loan.id}')">Ver Detalhes</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function viewLoan(id) {
+            selectedLoanId = id;
+            const loan = allLoans.find(l => l.id === id);
+            if (!loan) return;
+
+            // Client info
+            document.getElementById('detailShopName').textContent = loan.shopName || 'N/A';
+            document.getElementById('detailOwnerName').textContent = loan.ownerName || 'N/A';
+            document.getElementById('detailAmount').textContent = 'Kz ' + (loan.amount || 0).toLocaleString();
+            document.getElementById('detailBank').textContent = loan.bank || 'N/A';
+            document.getElementById('detailDate').textContent = formatDate(loan.date);
+            document.getElementById('detailTime').textContent = loan.createdAt ? new Date(loan.createdAt).toLocaleTimeString('pt-AO', {hour: '2-digit', minute:'2-digit'}) : '-';
+            document.getElementById('detailStatus').textContent = getStatusLabel(loan.status);
+            document.getElementById('detailId').textContent = loan.id;
+
+            // Risk scores
+            document.getElementById('detailHealthScore').textContent = (loan.healthScore || 0) + '/100';
+            document.getElementById('detailFraudScore').textContent = (loan.fraudScore || 0) + '%';
+            document.getElementById('detailRiskLabel').textContent = getRiskLabel(loan.healthScore || 0, loan.fraudScore || 0);
+            document.getElementById('detailRiskClass').textContent = getRiskClass(loan.healthScore || 0, loan.fraudScore || 0);
+
+            const healthBar = document.getElementById('healthScoreBar');
+            healthBar.style.width = (loan.healthScore || 0) + '%';
+            healthBar.className = 'score-fill ' + getScoreClass(loan.healthScore || 0);
+
+            const fraudBar = document.getElementById('fraudScoreBar');
+            fraudBar.style.width = (loan.fraudScore || 0) + '%';
+            fraudBar.className = 'score-fill ' + getScoreClass(loan.fraudScore || 0);
+
+            // Fraud analysis checks
+            const velocityAnomaly = loan.velocityAnomaly || 0;
+            const customerDiversity = loan.customerDiversity || 0;
+            const inventoryAnomaly = loan.inventoryAnomaly || 0;
+            const timeAnomaly = loan.timeAnomaly || 0;
+            const locationAnomaly = loan.locationAnomaly || 0;
+
+            document.getElementById('detailVelocityCheck').innerHTML = getCheckIcon(velocityAnomaly === 0) + ' ' + (velocityAnomaly === 0 ? 'OK' : 'ALERTA');
+            document.getElementById('detailVelocityDesc').textContent = velocityAnomaly > 0 ? `${velocityAnomaly} picos detectados` : 'Nenhum pico anómalo';
+
+            document.getElementById('detailCustomerDiversity').innerHTML = getCheckIcon(customerDiversity === 0) + ' ' + (customerDiversity === 0 ? 'OK' : 'ALERTA');
+            document.getElementById('detailCustomerDesc').textContent = customerDiversity > 0 ? 'Baixa diversidade de clientes' : 'Bom distribuição';
+
+            document.getElementById('detailInventoryFlow').innerHTML = getCheckIcon(inventoryAnomaly < 15) + ' ' + (inventoryAnomaly < 15 ? 'OK' : 'ALERTA');
+            document.getElementById('detailInventoryDesc').textContent = inventoryAnomaly > 0 ? `Taxa elevada: ${inventoryAnomaly}%` : 'Fluxo normal';
+
+            document.getElementById('detailTimePattern').innerHTML = getCheckIcon(timeAnomaly < 10) + ' ' + (timeAnomaly < 10 ? 'OK' : 'ALERTA');
+            document.getElementById('detailTimeDesc').textContent = timeAnomaly > 0 ? `${timeAnomaly}% vendas noturnas` : 'Padrão normal';
+
+            document.getElementById('detailLocationCheck').innerHTML = getCheckIcon(true) + ' OK';
+
+            // Financial metrics
+            document.getElementById('detailTransactions').textContent = loan.transactions || 0;
+            document.getElementById('detailTotalSales').textContent = 'Kz ' + (loan.totalSales || 0).toLocaleString();
+            document.getElementById('detailTotalExpenses').textContent = 'Kz ' + (loan.totalExpenses || 0).toLocaleString();
+            document.getElementById('detailTotalPurchases').textContent = 'Kz ' + (loan.totalPurchases || 0).toLocaleString();
+            document.getElementById('detailProfit').innerHTML = (loan.profit >= 0 ? '<span style="color:#22c55e;">Kz ' : '<span style="color:#ef4444;">-Kz ') + Math.abs(loan.profit || 0).toLocaleString() + '</span>';
+            document.getElementById('detailConsistency').textContent = (loan.consistency || 0) + '%';
+            document.getElementById('detailGrowth').innerHTML = ((loan.growth || 0) >= 0 ? '<span style="color:#22c55e;">+' : '<span style="color:#ef4444;">') + loan.growth + '%</span>';
+            document.getElementById('detailRetention').textContent = (loan.retention || 0) + '%';
+
+            // Velocity analysis
+            document.getElementById('detailVelocityBurst').textContent = velocityAnomaly > 0 ? `${velocityAnomaly} picos` : 'Nenhum';
+            document.getElementById('detailLateNightSales').textContent = loan.lateNightSales || 0;
+            document.getElementById('detailSalesRatio').textContent = loan.salesRatio || '1:0';
+            document.getElementById('detailUniqueCustomers').textContent = loan.uniqueCustomers || 'N/A';
+
+            // Transactions
+            const transBody = document.getElementById('transactionBody');
+            const transactions = loan.transactionsList || [];
+            transBody.innerHTML = transactions.length ? transactions.map(t => `
+                <tr>
+                    <td>${formatDate(t.date)}</td>
+                    <td>${getTypeLabel(t.type)}</td>
+                    <td style="color: ${(t.amount || 0) >= 0 ? '#22c55e' : '#ef4444'}">Kz ${(t.amount || 0).toLocaleString()}</td>
+                    <td>${t.method || 'N/A'}</td>
+                </tr>
+            `).join('') : '<tr><td colspan="4" style="text-align: center; color: #64748b;">Nenhuma transação disponível</td></tr>';
+
+            document.getElementById('actionButtons').style.display = loan.status === 'pending' ? 'flex' : 'none';
+            document.getElementById('loanModal').classList.add('active');
+        }
+
+        function getRiskLabel(healthScore, fraudScore) {
+            if (healthScore >= 80 && fraudScore >= 80) return 'BAIXO RISCO';
+            if (healthScore >= 60 || fraudScore >= 60) return 'MÉDIO RISCO';
+            if (healthScore >= 40 || fraudScore >= 40) return 'ALTO RISCO';
+            return 'MUITO ALTO RISCO';
+        }
+
+        function getRiskClass(healthScore, fraudScore) {
+            if (healthScore >= 80 && fraudScore >= 80) return 'VERIFICADO';
+            if (healthScore >= 60 || fraudScore >= 60) return 'BAIXO RISCO';
+            if (healthScore >= 40 || fraudScore >= 40) return 'MÉDIO RISCO';
+            return 'ALTO RISCO';
+        }
+
+        function getCheckIcon(isOk) {
+            return isOk ? '<span style="color:#22c55e;">✓</span>' : '<span style="color:#f59e0b;">⚠</span>';
+        }
+
+        function closeModal() { document.getElementById('loanModal').classList.remove('active'); }
+
+        async function updateStatus(status) {
+            await updateLoanStatus(selectedLoanId, status);
+            alert(status === 'approved' ? 'Solicitação aprovada!' : 'Solicitação rejeitada.');
+            closeModal();
+            loadLoans();
+        }
+
+        function formatDate(dateStr) {
+            if (!dateStr) return 'N/A';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('pt-AO');
+        }
+
+        function getStatusLabel(status) {
+            return { pending: 'Pendente', approved: 'Aprovado', rejected: 'Rejeitado' }[status] || status || 'Pendente';
+        }
+
+        function getTypeLabel(type) {
+            return { sale: 'Venda', expense: 'Despesa', purchase: 'Compra' }[type] || type || 'N/A';
+        }
+
+        function getScoreClass(score) {
+            if ((score || 0) >= 80) return 'score-high';
+            if ((score || 0) >= 50) return 'score-medium';
+            return 'score-low';
+        }
+
+        
+        function openAuditModal() {
+            document.getElementById('auditModal').classList.add('active');
+            renderAuditLog();
+        }
+        function closeAuditModal() {
+            document.getElementById('auditModal').classList.remove('active');
+        }
+        
+        document.getElementById('auditModal').addEventListener('click', e => { if (e.target === document.getElementById('auditModal')) closeAuditModal(); });
+        
+        function renderAuditLog() {
+            const auditBody = document.getElementById('auditBody');
+            const search = (document.getElementById('auditSearch') ? document.getElementById('auditSearch').value.toLowerCase() : '');
+            
+            // Filter all loans that have been processed (not pending) across all time
+            const processedLoans = allLoans.filter(l => l.status !== 'pending' && l.bank === currentBank);
+            
+            const filtered = processedLoans.filter(l => (l.shopName || '').toLowerCase().includes(search));
+            
+            if (filtered.length === 0) {
+                auditBody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #64748b;">Nenhuma decisão registada</td></tr>';
+                return;
+            }
+            
+            filtered.sort((a,b) => new Date(b.updatedAt || b.date) - new Date(a.updatedAt || a.date));
+            
+            auditBody.innerHTML = filtered.map(loan => `
+                <tr>
+                    <td>${formatDate(loan.updatedAt || loan.date)}</td>
+                    <td><strong>${loan.shopName || 'N/A'}</strong></td>
+                    <td>Kz ${(loan.amount || 0).toLocaleString()}</td>
+                    <td><span class="loan-status status-${loan.status}">${getStatusLabel(loan.status)}</span></td>
+                    <td>${loan.updatedBy || loan.bank || currentBank}</td>
+                </tr>
+            `).join('');
+        }
+        // Add search listener
+        setTimeout(() => {
+           if(document.getElementById('auditSearch')) {
+              document.getElementById('auditSearch').addEventListener('input', renderAuditLog);
+           }
+        }, 1000);
+
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeModal(); });
+        document.getElementById('loanModal').addEventListener('click', e => { if (e.target === document.getElementById('loanModal')) closeModal(); });
+    </script>
+</head>
+<body>
+    <div class="login-container" id="loginPage">
+        <div class="login-box">
+            <img src="../web/icons/Icon-192.png" alt="Logo" class="logo" style="background:none;">
+            <h2>Portal de Análise Kandonga</h2>
+            <p>Plataforma de análise de micro-crédito</p>
+
+            <div class="form-group">
+                <label>Banco</label>
+                <select id="bankSelect">
+                    <option value="">Selecione seu banco</option>
+                    <option value="BFA">Banco de Fomento Angola (BFA)</option>
+                    <option value="BAI">Banco Angolano de Investimentos (BAI)</option>
+                    <option value="BIC">Banco Intercontinental (BIC)</option>
+                    <option value="Atlantico">Banco Atlantico</option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label>Email</label>
+                <input type="email" id="emailInput" placeholder="seu@email.com">
+            </div>
+
+            <div class="form-group">
+                <label>Senha</label>
+                <input type="password" id="passwordInput" placeholder="••••••••">
+            </div>
+
+            <button class="btn" onclick="login()">Entrar</button>
+        </div>
+    </div>
+
+    <div class="dashboard" id="dashboard">
+        <div class="header">
+            <div class="header-left">
+                <img src="../web/icons/Icon-192.png" alt="Logo" class="header-logo" style="background:none;">
+                <h1>Portal Bancário</h1>
+            </div>
+            <div class="header-right">
+                <div class="user-info">
+                    <div class="user-avatar" id="userAvatar">B</div>
+                    <span id="bankName">BFA</span>
+                    <span id="connectionStatus" style="font-size: 12px; color: #22c55e;">● Online</span>
+                </div>
+                <button class="refresh-btn" onclick="openAuditModal()" style="margin-right: 12px; background: #e8f5e9; color: #4caf50;">Ver Registo (Audit)</button>
+                <button class="logout-btn" onclick="logout()">Sair</button>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card pending"><h3>Pendentes</h3><div class="value" id="pendingCount">0</div></div>
+            <div class="stat-card approved"><h3>Aprovados</h3><div class="value" id="approvedCount">0</div></div>
+            <div class="stat-card rejected"><h3>Rejeitados</h3><div class="value" id="rejectedCount">0</div></div>
+            <div class="stat-card total"><h3>Total Solicitado</h3><div class="value" id="totalAmount">Kz 0</div></div>
+        </div>
+
+        <div class="content">
+            <h2 class="section-title">
+                Solicitações de Micro-crédito
+                <button class="refresh-btn" onclick="loadLoans()">↻ Atualizar</button>
+            </h2>
+
+            <div class="filters">
+                <select id="statusFilter" onchange="filterLoans()">
+                    <option value="">Todos os Status</option>
+                    <option value="pending">Pendente</option>
+                    <option value="approved">Aprovado</option>
+                    <option value="rejected">Rejeitado</option>
+                </select>
+                <select id="amountFilter" onchange="filterLoans()">
+                    <option value="">Qualquer Valor</option>
+                    <option value="50000">Até 50.000 Kz</option>
+                    <option value="100000">Até 100.000 Kz</option>
+                    <option value="250000">Até 250.000 Kz</option>
+                    <option value="500000">500.000+ Kz</option>
+                </select>
+                <input type="text" id="searchInput" placeholder="Buscar por nome..." oninput="filterLoans()">
+            </div>
+
+            <div id="loadingState" class="spinner"></div>
+            <div class="loan-list" id="loanList"></div>
+        </div>
+    </div>
+
+    <div class="modal" id="loanModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Detalhes da Solicitação</h2>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+
+            <div class="detail-section">
+                <h3>Informações do Cliente</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Nome da Loja</label><span id="detailShopName">-</span></div>
+                    <div class="detail-item"><label>Nome do Proprietário</label><span id="detailOwnerName">-</span></div>
+                    <div class="detail-item"><label>Montante Solicitado</label><span id="detailAmount" style="color: #22c55e; font-size: 18px;">-</span></div>
+                    <div class="detail-item"><label>Banco</label><span id="detailBank">-</span></div>
+                    <div class="detail-item"><label>Data da Solicitação</label><span id="detailDate">-</span></div>
+                    <div class="detail-item"><label>Hora</label><span id="detailTime">-</span></div>
+                    <div class="detail-item"><label>Status Atual</label><span id="detailStatus">-</span></div>
+                    <div class="detail-item"><label>ID da Solicitação</label><span id="detailId" style="font-size: 12px; color: #64748b;">-</span></div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Pontuação de Risco e Confiança</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Pontuação de Saúde do Negócio</label>
+                        <span id="detailHealthScore">-</span>
+                        <div class="score-bar"><div class="score-fill score-high" id="healthScoreBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="detail-item">
+                        <label>Pontuação de Fraude</label>
+                        <span id="detailFraudScore">-</span>
+                        <div class="score-bar"><div class="score-fill score-high" id="fraudScoreBar" style="width: 0%"></div></div>
+                    </div>
+                    <div class="detail-item">
+                        <label>Risco</label>
+                        <span id="detailRiskLabel" style="font-weight: bold;">-</span>
+                    </div>
+                    <div class="detail-item">
+                        <label>Classificação</label>
+                        <span id="detailRiskClass">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Análise de Fraude</h3>
+                <div class="detail-grid">
+                    <div class="detail-item">
+                        <label>Verificação de Velocidade</label>
+                        <span id="detailVelocityCheck">-</span>
+                        <small id="detailVelocityDesc" style="color: #64748b;"></small>
+                    </div>
+                    <div class="detail-item">
+                        <label>Diversidade de Clientes</label>
+                        <span id="detailCustomerDiversity">-</span>
+                        <small id="detailCustomerDesc" style="color: #64748b;"></small>
+                    </div>
+                    <div class="detail-item">
+                        <label>Fluxo de Inventário</label>
+                        <span id="detailInventoryFlow">-</span>
+                        <small id="detailInventoryDesc" style="color: #64748b;"></small>
+                    </div>
+                    <div class="detail-item">
+                        <label>Padrão de Tempo</label>
+                        <span id="detailTimePattern">-</span>
+                        <small id="detailTimeDesc" style="color: #64748b;"></small>
+                    </div>
+                    <div class="detail-item">
+                        <label>Verificação de Localização</label>
+                        <span id="detailLocationCheck">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Métricas Financeiras</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Transações Totais</label><span id="detailTransactions">-</span></div>
+                    <div class="detail-item"><label>Vendas Totais</label><span id="detailTotalSales" style="color: #22c55e;">-</span></div>
+                    <div class="detail-item"><label>Despesas Totais</label><span id="detailTotalExpenses" style="color: #ef4444;">-</span></div>
+                    <div class="detail-item"><label>Compras Totais</label><span id="detailTotalPurchases" style="color: #f59e0b;">-</span></div>
+                    <div class="detail-item"><label>Lucro Líquido</label><span id="detailProfit">-</span></div>
+                    <div class="detail-item"><label>Consistência</label><span id="detailConsistency">-</span></div>
+                    <div class="detail-item"><label>Crescimento Mensal</label><span id="detailGrowth">-</span></div>
+                    <div class="detail-item"><label>Retenção</label><span id="detailRetention">-</span></div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Análise de Velocidade de Vendas</h3>
+                <div class="detail-grid">
+                    <div class="detail-item"><label>Picos Detectados</label><span id="detailVelocityBurst">-</span></div>
+                    <div class="detail-item"><label>Vendas em Horário Noturno</label><span id="detailLateNightSales">-</span></div>
+                    <div class="detail-item"><label>Razão Vendas/Compras</label><span id="detailSalesRatio">-</span></div>
+                    <div class="detail-item"><label>Clientes Únicos</label><span id="detailUniqueCustomers">-</span></div>
+                </div>
+            </div>
+
+            <div class="detail-section">
+                <h3>Histórico de Transações</h3>
+                <table class="transaction-table">
+                    <thead><tr><th>Data</th><th>Tipo</th><th>Montante</th><th>Método</th></tr></thead>
+                    <tbody id="transactionBody"></tbody>
+                </table>
+            </div>
+
+            <div class="detail-section" style="display: flex; gap: 12px;" id="actionButtons">
+                <button class="btn btn-success" onclick="updateStatus('approved')" style="flex: 1;">Aprovar</button>
+                <button class="btn btn-danger" onclick="updateStatus('rejected')" style="flex: 1;">Rejeitar</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Audit Log Modal -->
+    <div class="modal" id="auditModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2>Registo de Decisões de Micro-crédito</h2>
+                <button class="close-modal" onclick="closeAuditModal()">×</button>
+            </div>
+            <div class="filter-controls" style="margin-bottom: 20px;">
+               <input type="text" id="auditSearch" placeholder="Pesquisar loja..." style="padding:8px; border:1px solid #e2e8f0; border-radius:8px; width:100%;">
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="transaction-table">
+                    <thead>
+                        <tr>
+                            <th>Data</th>
+                            <th>Loja</th>
+                            <th>Montante</th>
+                            <th>Decisão</th>
+                            <th>Banco</th>
+                        </tr>
+                    </thead>
+                    <tbody id="auditBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

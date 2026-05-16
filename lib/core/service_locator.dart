@@ -10,7 +10,9 @@ import '../../features/shop/presentation/bloc/shop_bloc.dart';
 import '../../features/settings/data/repositories/printer_repository_impl.dart';
 import '../../features/settings/domain/repositories/printer_repository.dart';
 import '../../features/settings/presentation/bloc/printer_bloc.dart';
-
+import '../../features/accounting/data/repositories/accounting_repository_impl.dart';
+import '../../features/accounting/domain/repositories/accounting_repository.dart';
+import '../../features/accounting/presentation/bloc/accounting_bloc.dart';
 final sl = GetIt.instance;
 
 Future<void> init() async {
@@ -34,6 +36,12 @@ Future<void> init() async {
 
   sl.registerFactory(
     () => PrinterBloc(
+      repository: sl(),
+    ),
+  );
+
+  sl.registerFactory(
+    () => AccountingBloc(
       repository: sl(),
     ),
   );
@@ -63,5 +71,10 @@ Future<void> init() async {
   // Features - Settings / Printer
   sl.registerLazySingleton<PrinterRepository>(
     () => PrinterRepositoryImpl(),
+  );
+
+  // Features - Accounting
+  sl.registerLazySingleton<AccountingRepository>(
+    () => AccountingRepositoryImpl(),
   );
 }

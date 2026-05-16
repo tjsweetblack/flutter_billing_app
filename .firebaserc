@@ -1,0 +1,13 @@
+{
+  "apps": [
+    {
+      "site": "kandonga-portal",
+      "appId": "1:123456789:web:abcdef123456",
+      "storageBucket": "kandonga-c3d67.appspot.com",
+      "apiKey": "AIzaSyDEMO_KEY_REPLACE_WITH_REAL",
+      "authDomain": "kandonga-c3d67.firebaseapp.com",
+      "messagingSenderId": "123456789",
+      "projectId": "kandonga-c3d67"
+    }
+  ]
+}

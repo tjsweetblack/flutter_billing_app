@@ -1,0 +1,34 @@
+#!/bin/bash
+find lib -name "*.dart" -type f | xargs sed -i '' \
+  -e "s/'Checkout'/'Finalizar'/g" \
+  -e "s/'Failed to process payment: /'Falha ao processar pagamento: /g" \
+  -e "s/'Printed successfully'/'Impresso com sucesso'/g" \
+  -e "s/'Amount Given (Kz)'/'Valor Entregue (Kz)'/g" \
+  -e "s/'Print Receipt (Optional)'/'Imprimir Recibo (Opcional)'/g" \
+  -e "s/'No transactions to export'/'Sem transações para exportar'/g" \
+  -e "s/'Exported /'Exportou /g" \
+  -e "s/ transactions and sharing...'/ transações e compartilhando...'/g" \
+  -e "s/'Export failed: /'Falha na exportação: /g" \
+  -e "s/'CSV exported and sharing...'/'CSV exportado e compartilhando...'/g" \
+  -e "s/'PDF exported and sharing...'/'PDF exportado e compartilhando...'/g" \
+  -e "s/'Limpar Tudo'/'Limpar Tudo'/g" \
+  -e "s/'Camera OCR coming soon!'/'Câmera OCR em breve!'/g" \
+  -e "s/'Camera'/'Câmera'/g" \
+  -e "s/'Manual'/'Manual'/g" \
+  -e "s/'Export CSV'/'Exportar CSV'/g" \
+  -e "s/'Export PDF'/'Exportar PDF'/g" \
+  -e "s/'AGT Export'/'Exportação AGT'/g" \
+  -e "s/'Scan Receipt'/'Escanear Recibo'/g" \
+  -e "s/'Business Health Score'/'Pontuação de Saúde do Negócio'/g" \
+  -e "s/'Request Micro-Loan'/'Solicitar Micro-crédito'/g" \
+  -e "s/'Submit Request'/'Submeter Solicitação'/g" \
+  -e "s/'OK'/'OK'/g" \
+  -e "s/'Total'/'Total'/g" \
+  -e "s/Text('No transactions')/Text('Sem transações')/g" \
+  -e "s/'Exported from Billing App'/'Exportado do Aplicativo de Facturação'/g" \
+  -e "s/pw.Text('IVA Collected:')/pw.Text('IVA Arrecadado:')/g" \
+  -e "s/pw.Text('IVA Paid:')/pw.Text('IVA Pago:')/g" \
+  -e "s/pw.Text('Net IVA:'/pw.Text('IVA Líquido:'/g" \
+  -e "s/'Clear All'/'Limpar Tudo'/g" \
+  -e "s/'Cancelar'/'Cancelar'/g" \
+  -e "s/'Apagar'/'Apagar'/g"
