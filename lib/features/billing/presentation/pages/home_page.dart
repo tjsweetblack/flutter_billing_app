@@ -409,16 +409,10 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Container(
-            width: 80,
+          Image.asset(
+            'assets/logo-full-no-bg.png',
             height: 80,
-            decoration: BoxDecoration(
-              color: Colors.grey[100],
-              shape: BoxShape.circle,
-            ),
-            alignment: Alignment.center,
-            child:
-                Icon(Icons.shopping_basket, size: 40, color: Colors.grey[300]),
+            fit: BoxFit.contain,
           ),
           const SizedBox(height: 16),
           const Text('A lista está vazia',

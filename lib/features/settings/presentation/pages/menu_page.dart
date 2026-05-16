@@ -37,7 +37,13 @@ class _MenuPageState extends State<MenuPage> {
         leading: IconButton(
           icon: Icon(Icons.chevron_left,
               size: 28, color: Theme.of(context).primaryColor),
-          onPressed: () => context.pop(),
+          onPressed: () {
+            if (context.canPop()) {
+              context.pop();
+            } else {
+              context.go('/');
+            }
+          },
         ),
       ),
       body: SingleChildScrollView(
