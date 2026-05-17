@@ -19,6 +19,16 @@ subprojects {
     project.evaluationDependsOn(":app")
 }
 
+subprojects {
+    plugins.withType<com.android.build.gradle.LibraryPlugin>().configureEach {
+        extensions.configure<com.android.build.gradle.LibraryExtension> {
+            if (namespace.isNullOrEmpty()) {
+                namespace = "com.kandonga.billing.${project.name.replace("-", "_")}"
+            }
+        }
+    }
+}
+
 tasks.register<Delete>("clean") {
     delete(rootProject.layout.buildDirectory)
 }

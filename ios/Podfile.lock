@@ -1200,6 +1200,8 @@ PODS:
     - Firebase/Firestore (= 11.15.0)
     - firebase_core
     - Flutter
+  - device_info_plus (0.0.1):
+    - Flutter
   - Firebase/CoreOnly (11.15.0):
     - FirebaseCore (~> 11.15.0)
   - Firebase/Firestore (11.15.0):
@@ -1239,8 +1241,6 @@ PODS:
     - nanopb (~> 3.30910.0)
   - FirebaseSharedSwift (11.15.0)
   - Flutter (1.0.0)
-  - flutter_vibrate (0.0.1):
-    - Flutter
   - GoogleUtilities/Environment (8.1.0):
     - GoogleUtilities/Privacy
   - GoogleUtilities/Logger (8.1.0):
@@ -1359,18 +1359,21 @@ PODS:
     - Flutter
   - share_plus (0.0.1):
     - Flutter
+  - vibration (1.7.5):
+    - Flutter
 
 DEPENDENCIES:
   - app_settings (from `.symlinks/plugins/app_settings/ios`)
   - cloud_firestore (from `.symlinks/plugins/cloud_firestore/ios`)
+  - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - Flutter (from `Flutter`)
-  - flutter_vibrate (from `.symlinks/plugins/flutter_vibrate/ios`)
   - mobile_scanner (from `.symlinks/plugins/mobile_scanner/darwin`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - print_bluetooth_thermal (from `.symlinks/plugins/print_bluetooth_thermal/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
+  - vibration (from `.symlinks/plugins/vibration/ios`)
 
 SPEC REPOS:
   trunk:
@@ -1395,12 +1398,12 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/app_settings/ios"
   cloud_firestore:
     :path: ".symlinks/plugins/cloud_firestore/ios"
+  device_info_plus:
+    :path: ".symlinks/plugins/device_info_plus/ios"
   firebase_core:
     :path: ".symlinks/plugins/firebase_core/ios"
   Flutter:
     :path: Flutter
-  flutter_vibrate:
-    :path: ".symlinks/plugins/flutter_vibrate/ios"
   mobile_scanner:
     :path: ".symlinks/plugins/mobile_scanner/darwin"
   path_provider_foundation:
@@ -1411,12 +1414,15 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/print_bluetooth_thermal/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
+  vibration:
+    :path: ".symlinks/plugins/vibration/ios"
 
 SPEC CHECKSUMS:
   abseil: a05cc83bf02079535e17169a73c5be5ba47f714b
   app_settings: 0341ec6daa4f0c50f5a421bf0ad7c36084db6e90
   BoringSSL-GRPC: dded2a44897e45f28f08ae87a55ee4bcd19bc508
   cloud_firestore: fdcc87898326e396d6ef6df543acf9b5c2034b95
+  device_info_plus: 21fcca2080fbcd348be798aa36c3e5ed849eefbe
   Firebase: d99ac19b909cd2c548339c2241ecd0d1599ab02e
   firebase_core: 995454a784ff288be5689b796deb9e9fa3601818
   FirebaseAppCheckInterop: 06fe5a3799278ae4667e6c432edd86b1030fa3df
@@ -1427,7 +1433,6 @@ SPEC CHECKSUMS:
   FirebaseFirestoreInternal: df9ab608a59a4e8eefd0796ed7652f3c1a88473a
   FirebaseSharedSwift: e17c654ef1f1a616b0b33054e663ad1035c8fd40
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  flutter_vibrate: 207bbbeb62dd5638b479846c8e46168d7229f14a
   GoogleUtilities: 00c88b9a86066ef77f0da2fab05f65d7768ed8e1
   "gRPC-C++": cc207623316fb041a7a3e774c252cf68a058b9e8
   gRPC-Core: 860978b7db482de8b4f5e10677216309b5ff6330
@@ -1438,6 +1443,7 @@ SPEC CHECKSUMS:
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   print_bluetooth_thermal: 28adf527ac4c47e42e268c13d21e5f2abf48ecdd
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
+  vibration: 8e2f50fc35bb736f9eecb7dd9f7047fbb6a6e888
 
 PODFILE CHECKSUM: ed5b75e47620744c9467406892d54036782218c9
 

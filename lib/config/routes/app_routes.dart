@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import '../../features/auth/presentation/pages/login_page.dart';
 import '../../features/billing/presentation/pages/home_page.dart';
 import '../../features/product/presentation/pages/product_list_page.dart';
 import '../../features/product/presentation/pages/add_product_page.dart';
@@ -13,8 +14,12 @@ import '../../features/accounting/presentation/pages/credit_score_page.dart';
 import '../../features/product/domain/entities/product.dart';
 
 final router = GoRouter(
-  initialLocation: '/',
+  initialLocation: '/login',
   routes: [
+    GoRoute(
+      path: '/login',
+      builder: (context, state) => const LoginPage(),
+    ),
     GoRoute(
       path: '/',
       builder: (context, state) => const HomePage(),
@@ -54,7 +59,6 @@ final router = GoRouter(
           builder: (context, state) {
             final product = state.extra as Product?;
             if (product == null) {
-              // If we land here without extra (e.g. deep link), go back to products for now.
               return const ProductListPage();
             }
             return EditProductPage(product: product);

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:provider/provider.dart';
 import 'config/routes/app_routes.dart';
 import 'core/data/hive_database.dart';
 import 'core/service_locator.dart' as di;
@@ -10,6 +11,7 @@ import 'features/shop/presentation/bloc/shop_bloc.dart';
 import 'features/settings/presentation/bloc/printer_bloc.dart';
 import 'features/settings/presentation/bloc/printer_event.dart';
 import 'features/accounting/presentation/bloc/accounting_bloc.dart';
+import 'features/auth/presentation/bloc/auth_state.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -23,24 +25,27 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MultiBlocProvider(
-      providers: [
-        BlocProvider<ProductBloc>(
-            create: (context) => di.sl<ProductBloc>()..add(LoadProducts())),
-        BlocProvider<ShopBloc>(
-            create: (context) => di.sl<ShopBloc>()..add(LoadShopEvent())),
-        BlocProvider<BillingBloc>(
-            create: (context) => di.sl<BillingBloc>()),
-        BlocProvider<PrinterBloc>(
-            create: (context) => di.sl<PrinterBloc>()..add(InitPrinterEvent())),
-        BlocProvider<AccountingBloc>(
-            create: (context) => di.sl<AccountingBloc>()),
-      ],
-      child: MaterialApp.router(
-        title: 'Billing App',
-        theme: AppTheme.lightTheme,
-        routerConfig: router,
-        debugShowCheckedModeBanner: false,
+    return ChangeNotifierProvider(
+      create: (_) => AuthState(),
+      child: MultiBlocProvider(
+        providers: [
+          BlocProvider<ProductBloc>(
+              create: (context) => di.sl<ProductBloc>()..add(LoadProducts())),
+          BlocProvider<ShopBloc>(
+              create: (context) => di.sl<ShopBloc>()..add(LoadShopEvent())),
+          BlocProvider<BillingBloc>(
+              create: (context) => di.sl<BillingBloc>()),
+          BlocProvider<PrinterBloc>(
+              create: (context) => di.sl<PrinterBloc>()..add(InitPrinterEvent())),
+          BlocProvider<AccountingBloc>(
+              create: (context) => di.sl<AccountingBloc>()),
+        ],
+        child: MaterialApp.router(
+          title: 'Billing App',
+          theme: AppTheme.lightTheme,
+          routerConfig: router,
+          debugShowCheckedModeBanner: false,
+        ),
       ),
     );
   }

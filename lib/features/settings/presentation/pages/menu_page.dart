@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:app_settings/app_settings.dart';
-import 'package:flutter/services.dart';
 
 import '../../../../core/theme/app_theme.dart';
+import '../../../auth/presentation/bloc/auth_state.dart';
 import '../../../shop/presentation/bloc/shop_bloc.dart';
 import '../bloc/printer_bloc.dart';
 import '../bloc/printer_event.dart';
@@ -277,6 +277,20 @@ class _MenuPageState extends State<MenuPage> {
               ),
             ),
 
+            const SizedBox(height: 24),
+
+            _buildSectionHeader('Conta'),
+            _buildListGroup(
+              children: [
+                _buildListItem(
+                  icon: Icons.logout,
+                  title: 'Terminar Sessão',
+                  subtitle: 'Sair da conta',
+                  onTap: () => _showLogoutDialog(),
+                ),
+              ],
+            ),
+
             const SizedBox(height: 48),
           ],
         ),
@@ -525,6 +539,33 @@ class _MenuPageState extends State<MenuPage> {
               Icon(trailingIcon, color: Colors.grey[300]),
           ],
         ),
+      ),
+    );
+  }
+
+  void _showLogoutDialog() {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Terminar Sessão'),
+        content: const Text('Tem certeza que deseja sair?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Cancelar'),
+          ),
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(context);
+              context.read<AuthState>().logout();
+              context.go('/login');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.red,
+            ),
+            child: const Text('Sair'),
+          ),
+        ],
       ),
     );
   }
